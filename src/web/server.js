@@ -71,7 +71,12 @@ async function startWebServer() {
       botEvents.on('qr', onQr);
       botEvents.on('connected', onConnected);
 
-      await startSock(`web-${requestId}`, 'qr');
+      res.json({ success: true, requestId });
+
+      startSock(`web-${requestId}`, 'qr').catch((err) => {
+        logger.error(`[WEB] startSock failed for pair/qr ${requestId}: ${err.message}`);
+        io.to(requestId).emit('pair-error', { message: 'Failed to start QR pairing session.' });
+      });
 
       setTimeout(async () => {
         const session = await PairSession.findOne({ requestId });
@@ -81,8 +86,6 @@ async function startWebServer() {
           cleanup();
         }
       }, config.pairing.qrExpirySeconds * 1000);
-
-      res.json({ success: true, requestId });
     } catch (err) {
       logger.error(`[WEB] QR pairing error: ${err.message}`);
       res.status(500).json({ success: false, message: 'Failed to start QR pairing.' });
@@ -128,7 +131,17 @@ async function startWebServer() {
       botEvents.on('pair-code', onCode);
       botEvents.on('connected', onConnected);
 
-      await startSock(`web-${requestId}`, 'code', phoneNumber);
+      // Respond with the requestId immediately so the client can join the
+      // socket room BEFORE startSock (running in the background) generates
+      // and emits the pairing code. Awaiting startSock here would generate
+      // the code before the client ever subscribes, and the emit would go
+      // to an empty room.
+      res.json({ success: true, requestId });
+
+      startSock(`web-${requestId}`, 'code', phoneNumber).catch((err) => {
+        logger.error(`[WEB] startSock failed for pair/code ${requestId}: ${err.message}`);
+        io.to(requestId).emit('pair-error', { message: 'Failed to start pairing session.' });
+      });
 
       setTimeout(async () => {
         const session = await PairSession.findOne({ requestId });
@@ -138,8 +151,6 @@ async function startWebServer() {
           cleanup();
         }
       }, config.pairing.codeExpirySeconds * 1000);
-
-      res.json({ success: true, requestId });
     } catch (err) {
       logger.error(`[WEB] Pair code error: ${err.message}`);
       res.status(500).json({ success: false, message: 'Failed to generate pair code.' });
