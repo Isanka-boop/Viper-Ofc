@@ -53,8 +53,6 @@ async function startWebServer() {
         expiresAt
       });
 
-      await startSock(`web-${requestId}`, 'qr');
-
       const onQr = async (qr) => {
         const dataUrl = await QRCode.toDataURL(qr);
         io.to(requestId).emit('qr', { qr: dataUrl, expiresIn: config.pairing.qrExpirySeconds });
@@ -72,6 +70,8 @@ async function startWebServer() {
 
       botEvents.on('qr', onQr);
       botEvents.on('connected', onConnected);
+
+      await startSock(`web-${requestId}`, 'qr');
 
       setTimeout(async () => {
         const session = await PairSession.findOne({ requestId });
@@ -108,8 +108,6 @@ async function startWebServer() {
         expiresAt
       });
 
-      await startSock(`web-${requestId}`, 'code', phoneNumber);
-
       const onCode = async (code) => {
         await PairSession.updateOne({ requestId }, { $set: { code } });
         io.to(requestId).emit('code', { code, expiresIn: config.pairing.codeExpirySeconds });
@@ -125,8 +123,12 @@ async function startWebServer() {
         botEvents.off('connected', onConnected);
       };
 
+      // Listeners must be attached BEFORE startSock runs — it can request
+      // and emit the pairing code synchronously before this call resolves.
       botEvents.on('pair-code', onCode);
       botEvents.on('connected', onConnected);
+
+      await startSock(`web-${requestId}`, 'code', phoneNumber);
 
       setTimeout(async () => {
         const session = await PairSession.findOne({ requestId });
