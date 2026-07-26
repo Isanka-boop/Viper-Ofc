@@ -5,8 +5,8 @@ module.exports = {
   nodeEnv: process.env.NODE_ENV || 'production',
   baseUrl: process.env.BASE_URL || 'http://localhost:3000',
 
-  mongodbUri: process.env.MONGODB_URI || 'mongodb+srv://firstbro882_db_user:jr1yrw6kFenQ2Dei@visper-md-main.ilygjnh.mongodb.net/',
-  mongodbDbName: process.env.MONGODB_DB_NAME || 'Vipermd',
+  mongodbUri: process.env.MONGODB_URI || 'mongodb+srv://maliquotes6_db_user:FlDox4Qcie9JUzZ9@cluster0.bbsrc3v.mongodb.net/',
+  mongodbDbName: process.env.MONGODB_DB_NAME || 'Cluster0',
 
   bot: {
     name: process.env.BOT_NAME || 'V!PER MD OFC',
