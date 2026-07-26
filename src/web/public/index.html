@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V!PER MD OFC - WhatsApp Multi-Device Bot</title>
+<meta name="description" content="V!PER MD OFC is an ultra fast WhatsApp multi device bot built on Baileys. Pair instantly with a QR code or pair code and unlock over 100 commands.">
+<meta name="keywords" content="whatsapp bot, baileys, multi device bot, viper md, pair code, qr pairing">
+<meta property="og:title" content="V!PER MD OFC - WhatsApp Multi Device Bot">
+<meta property="og:description" content="Pair your WhatsApp instantly. Ultra fast, modern, production ready.">
+<meta property="og:image" content="https://i.ibb.co/G4z2SQ4M/160640.png">
+<link rel="icon" href="https://i.ibb.co/G4z2SQ4M/160640.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-void:#06070c;
+    --bg-deep:#0a0c16;
+    --glass:rgba(20,22,38,0.55);
+    --glass-border:rgba(126,231,178,0.18);
+    --glass-border-strong:rgba(126,231,178,0.4);
+    --viper-green:#7ee7b2;
+    --viper-violet:#8b7bff;
+    --viper-pink:#ff6fa5;
+    --text-primary:#f3f5f4;
+    --text-dim:#9aa3ab;
+    --text-faint:#5f6870;
+    --danger:#ff5f7e;
+    --radius-lg:24px;
+    --radius-md:16px;
+    --radius-sm:10px;
+    --font-display:'Sora',sans-serif;
+    --font-body:'Space Grotesk',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(circle at 15% 10%, rgba(139,123,255,0.14), transparent 40%),
+      radial-gradient(circle at 85% 20%, rgba(126,231,178,0.12), transparent 45%),
+      radial-gradient(circle at 50% 90%, rgba(255,111,165,0.08), transparent 50%),
+      var(--bg-void);
+    color:var(--text-primary);
+    font-family:var(--font-body);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+  body::before{
+    content:'';
+    position:fixed;inset:0;
+    background-image:
+      linear-gradient(rgba(126,231,178,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(126,231,178,0.03) 1px, transparent 1px);
+    background-size:48px 48px;
+    pointer-events:none;
+    z-index:0;
+    mask-image:radial-gradient(circle at 50% 0%, black, transparent 75%);
+  }
+  .scales{
+    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.5;
+    background-image:radial-gradient(circle at 20% 30%, rgba(126,231,178,0.05) 0, transparent 8%),
+                      radial-gradient(circle at 70% 60%, rgba(139,123,255,0.05) 0, transparent 8%),
+                      radial-gradient(circle at 40% 80%, rgba(255,111,165,0.04) 0, transparent 8%);
+  }
+  ::selection{background:var(--viper-green);color:#04150c;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+
+  /* NAV */
+  nav{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(20px) saturate(160%);
+    -webkit-backdrop-filter:blur(20px) saturate(160%);
+    background:rgba(6,7,12,0.65);
+    border-bottom:1px solid var(--glass-border);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;max-width:1180px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand img{width:38px;height:38px;border-radius:10px;border:1px solid var(--glass-border-strong);}
+  .brand-name{font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:0.5px;}
+  .brand-name span{color:var(--viper-green);}
+  .nav-links{display:flex;gap:28px;align-items:center;}
+  .nav-links a{font-size:14px;color:var(--text-dim);font-weight:500;transition:color .2s;}
+  .nav-links a:hover{color:var(--viper-green);}
+  .nav-cta{
+    padding:10px 20px;border-radius:999px;
+    background:linear-gradient(135deg,var(--viper-green),var(--viper-violet));
+    color:#04150c;font-weight:700;font-size:13px;
+    box-shadow:0 0 24px rgba(126,231,178,0.25);
+    transition:transform .2s;
+  }
+  .nav-cta:hover{transform:translateY(-2px);}
+  .burger{display:none;background:none;border:none;color:var(--text-primary);font-size:24px;cursor:pointer;}
+
+  /* HERO */
+  .hero{padding:100px 0 60px;position:relative;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:var(--font-mono);font-size:12px;letter-spacing:1.5px;
+    color:var(--viper-green);text-transform:uppercase;
+    padding:6px 14px;border:1px solid var(--glass-border-strong);border-radius:999px;
+    background:rgba(126,231,178,0.06);margin-bottom:28px;
+  }
+  .pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--viper-green);box-shadow:0 0 10px var(--viper-green);animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+  .hero h1{
+    font-family:var(--font-display);font-weight:800;
+    font-size:clamp(40px,7vw,76px);line-height:1.02;letter-spacing:-1.5px;
+    max-width:820px;
+  }
+  .hero h1 .accent{
+    background:linear-gradient(120deg,var(--viper-green),var(--viper-violet) 60%,var(--viper-pink));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p{margin-top:24px;font-size:18px;color:var(--text-dim);max-width:600px;line-height:1.6;}
+  .hero-actions{display:flex;gap:16px;margin-top:40px;flex-wrap:wrap;}
+  .btn-primary{
+    padding:16px 30px;border-radius:14px;font-weight:700;font-size:15px;
+    background:linear-gradient(135deg,var(--viper-green),var(--viper-violet));
+    color:#04150c;box-shadow:0 8px 30px rgba(126,231,178,0.25);
+    transition:transform .25s, box-shadow .25s;cursor:pointer;border:none;
+    font-family:var(--font-body);
+  }
+  .btn-primary:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(126,231,178,0.35);}
+  .btn-ghost{
+    padding:16px 30px;border-radius:14px;font-weight:600;font-size:15px;
+    background:var(--glass);border:1px solid var(--glass-border);color:var(--text-primary);
+    backdrop-filter:blur(12px);cursor:pointer;transition:.25s;font-family:var(--font-body);
+  }
+  .btn-ghost:hover{border-color:var(--glass-border-strong);}
+  .hero-stats{display:flex;gap:40px;margin-top:64px;flex-wrap:wrap;}
+  .stat-num{font-family:var(--font-display);font-size:32px;font-weight:800;color:var(--viper-green);}
+  .stat-label{font-size:13px;color:var(--text-faint);margin-top:4px;letter-spacing:0.3px;}
+
+  /* GLASS CARD BASE */
+  .glass-card{
+    background:var(--glass);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-lg);
+    backdrop-filter:blur(24px) saturate(160%);
+    -webkit-backdrop-filter:blur(24px) saturate(160%);
+    box-shadow:0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+    position:relative;
+    overflow:hidden;
+  }
+  .glass-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--glass-border-strong),transparent);
+  }
+
+  /* SECTION HEADERS */
+  .section{padding:100px 0;}
+  .section-head{max-width:640px;margin-bottom:56px;}
+  .section-tag{font-family:var(--font-mono);font-size:12px;letter-spacing:2px;color:var(--viper-violet);text-transform:uppercase;}
+  .section-head h2{font-family:var(--font-display);font-size:clamp(30px,4vw,44px);font-weight:800;margin-top:12px;letter-spacing:-1px;}
+  .section-head p{margin-top:16px;color:var(--text-dim);font-size:16px;line-height:1.6;}
+
+  /* PAIRING */
+  .pair-panel{padding:44px;}
+  .pair-tabs{display:flex;gap:8px;background:rgba(255,255,255,0.03);padding:6px;border-radius:14px;margin-bottom:32px;width:fit-content;}
+  .pair-tab{padding:10px 22px;border-radius:10px;font-weight:600;font-size:14px;color:var(--text-dim);cursor:pointer;transition:.2s;border:none;background:none;font-family:var(--font-body);}
+  .pair-tab.active{background:linear-gradient(135deg,var(--viper-green),var(--viper-violet));color:#04150c;}
+  .pair-body{display:none;}
+  .pair-body.active{display:block;animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  .qr-stage{display:flex;gap:40px;flex-wrap:wrap;align-items:center;}
+  .qr-box{
+    width:260px;height:260px;border-radius:20px;
+    background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);
+    display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;
+    overflow:hidden;
+  }
+  .qr-box img{width:220px;height:220px;border-radius:8px;background:#fff;padding:8px;}
+  .qr-placeholder{color:var(--text-faint);font-size:13px;text-align:center;padding:20px;font-family:var(--font-mono);}
+  .qr-scan-line{
+    position:absolute;left:0;right:0;height:2px;top:0;
+    background:linear-gradient(90deg,transparent,var(--viper-green),transparent);
+    box-shadow:0 0 12px var(--viper-green);
+    animation:scan 2.2s linear infinite;display:none;
+  }
+  .qr-box.scanning .qr-scan-line{display:block;}
+  @keyframes scan{0%{top:0;}100%{top:100%;}}
+
+  .qr-info{flex:1;min-width:220px;}
+  .countdown-ring{position:relative;width:64px;height:64px;margin-bottom:16px;}
+  .countdown-ring svg{transform:rotate(-90deg);}
+  .countdown-ring circle{fill:none;stroke-width:5;}
+  .ring-bg{stroke:rgba(255,255,255,0.08);}
+  .ring-fg{stroke:var(--viper-green);stroke-linecap:round;transition:stroke-dashoffset 1s linear;}
+  .countdown-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-weight:600;font-size:16px;}
+  .status-line{font-size:14px;color:var(--text-dim);margin-top:12px;display:flex;align-items:center;gap:8px;}
+  .status-badge{padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;}
+  .badge-waiting{background:rgba(139,123,255,0.15);color:var(--viper-violet);}
+  .badge-connected{background:rgba(126,231,178,0.15);color:var(--viper-green);}
+  .badge-expired{background:rgba(255,95,126,0.15);color:var(--danger);}
+
+  .code-input-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;}
+  .code-input{
+    flex:1;min-width:220px;padding:16px 18px;border-radius:14px;
+    background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);
+    color:var(--text-primary);font-size:15px;font-family:var(--font-mono);
+    outline:none;transition:.2s;
+  }
+  .code-input:focus{border-color:var(--glass-border-strong);box-shadow:0 0 0 3px rgba(126,231,178,0.1);}
+  .code-input::placeholder{color:var(--text-faint);}
+  .pair-code-display{
+    font-family:var(--font-mono);font-size:38px;font-weight:700;letter-spacing:6px;
+    background:linear-gradient(120deg,var(--viper-green),var(--viper-violet));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    padding:24px 0;
+  }
+  .connected-panel{text-align:center;padding:20px 0;}
+  .check-circle{
+    width:64px;height:64px;border-radius:50%;
+    background:rgba(126,231,178,0.12);border:1px solid var(--viper-green);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+  }
+  .support-box{
+    margin-top:20px;padding:18px 22px;border-radius:14px;
+    background:rgba(139,123,255,0.08);border:1px solid rgba(139,123,255,0.25);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  }
+
+  /* FEATURES GRID */
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .feature-card{padding:28px;transition:.3s;}
+  .feature-card:hover{transform:translateY(-4px);border-color:var(--glass-border-strong);}
+  .feature-icon{width:44px;height:44px;border-radius:12px;background:rgba(126,231,178,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+  .feature-card h3{font-family:var(--font-display);font-size:17px;font-weight:700;margin-bottom:8px;}
+  .feature-card p{font-size:14px;color:var(--text-dim);line-height:1.6;}
+
+  /* DASHBOARD PREVIEW */
+  .dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+  .dash-card{padding:24px;}
+  .dash-label{font-size:12px;color:var(--text-faint);text-transform:uppercase;letter-spacing:1px;font-family:var(--font-mono);}
+  .dash-value{font-family:var(--font-display);font-size:30px;font-weight:800;margin-top:8px;color:var(--viper-green);}
+  .dash-sub{font-size:12px;color:var(--text-faint);margin-top:6px;}
+
+  /* COMMAND LIST */
+  .cmd-search{
+    width:100%;padding:16px 20px;border-radius:14px;margin-bottom:24px;
+    background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);
+    color:var(--text-primary);font-size:14px;font-family:var(--font-body);outline:none;
+  }
+  .cmd-categories{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;}
+  .cmd-cat-pill{padding:8px 16px;border-radius:999px;font-size:13px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);cursor:pointer;color:var(--text-dim);transition:.2s;}
+  .cmd-cat-pill.active{background:var(--viper-green);color:#04150c;border-color:var(--viper-green);font-weight:700;}
+  .cmd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .cmd-chip{padding:14px 16px;font-size:13px;font-family:var(--font-mono);color:var(--text-dim);}
+  .cmd-chip b{color:var(--viper-green);}
+
+  footer{padding:60px 0 40px;border-top:1px solid var(--glass-border);margin-top:60px;}
+  .footer-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:40px;}
+  .footer-links{display:flex;gap:24px;flex-wrap:wrap;}
+  .footer-links a{font-size:14px;color:var(--text-dim);}
+  .footer-links a:hover{color:var(--viper-green);}
+  .footer-text{margin-top:30px;font-size:12px;color:var(--text-faint);font-family:var(--font-mono);letter-spacing:0.3px;line-height:1.8;}
+
+  /* LEGAL PAGES */
+  .legal-page{display:none;}
+  .legal-page.active{display:block;}
+  .legal-page .glass-card{padding:44px;}
+  .legal-page h2{font-family:var(--font-display);font-size:32px;margin-bottom:8px;}
+  .legal-page h3{font-family:var(--font-display);font-size:18px;margin-top:28px;margin-bottom:10px;color:var(--viper-green);}
+  .legal-page p, .legal-page li{color:var(--text-dim);line-height:1.7;font-size:14.5px;}
+  .legal-page ul{padding-left:20px;margin-top:8px;}
+  .legal-page .updated{font-size:12px;color:var(--text-faint);font-family:var(--font-mono);margin-bottom:20px;}
+  .back-link{display:inline-flex;align-items:center;gap:6px;margin-bottom:24px;color:var(--viper-green);font-size:14px;font-weight:600;cursor:pointer;}
+  .faq-item{border-bottom:1px solid var(--glass-border);padding:18px 0;cursor:pointer;}
+  .faq-q{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:15px;}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;color:var(--text-dim);font-size:14px;line-height:1.6;}
+  .faq-item.open .faq-a{max-height:200px;padding-top:12px;}
+  .faq-plus{transition:.3s;color:var(--viper-green);font-size:20px;}
+  .faq-item.open .faq-plus{transform:rotate(45deg);}
+
+  @media(max-width:900px){
+    .grid-3{grid-template-columns:1fr;}
+    .dash-grid{grid-template-columns:repeat(2,1fr);}
+    .cmd-grid{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+    .burger{display:block;}
+    .footer-grid{flex-direction:column;}
+  }
+</style>
+</head>
+<body oncontextmenu="return false;">
+<div class="scales"></div>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand">
+      <img src="https://i.ibb.co/G4z2SQ4M/160640.png" alt="V!PER MD OFC logo">
+      <div class="brand-name">V!PER MD <span>OFC</span></div>
+    </div>
+    <div class="nav-links">
+      <a href="#pair">Pair</a>
+      <a href="#features">Features</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#commands">Commands</a>
+      <a href="#" onclick="showLegal('faq');return false;">FAQ</a>
+    </div>
+    <a href="#pair" class="nav-cta">Connect Now</a>
+  </div>
+</nav>
+
+<main id="main-view">
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="pulse-dot"></span> Multi Device Engine Online</div>
+    <h1>Pair your WhatsApp<br>in <span class="accent">under 30 seconds</span></h1>
+    <p>V!PER MD OFC is an ultra fast, production grade WhatsApp bot built on Baileys multi device. Scan a code, unlock over 100 commands, and run a bot that feels genuinely premium.</p>
+    <div class="hero-actions">
+      <a href="#pair" class="btn-primary">Start Pairing</a>
+      <a href="https://whatsapp.com/channel/0029Vb86hKVJUM2SYD2qNw3K" target="_blank" class="btn-ghost">Join Support Channel</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num" id="stat-commands">100+</div><div class="stat-label">Commands</div></div>
+      <div><div class="stat-num">30s</div><div class="stat-label">Pair expiry window</div></div>
+      <div><div class="stat-num">MD</div><div class="stat-label">Multi device native</div></div>
+      <div><div class="stat-num" id="stat-uptime">--</div><div class="stat-label">Bot status</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pair">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Connection</div>
+      <h2>Link your device</h2>
+      <p>Choose a pairing method below. Both the QR code and pair code expire after 30 seconds for your security, and refresh automatically.</p>
+    </div>
+
+    <div class="glass-card pair-panel">
+      <div class="pair-tabs">
+        <button class="pair-tab active" onclick="switchTab('qr')">QR Code</button>
+        <button class="pair-tab" onclick="switchTab('code')">Pair Code</button>
+      </div>
+
+      <div class="pair-body active" id="tab-qr">
+        <div class="qr-stage">
+          <div class="qr-box" id="qr-box">
+            <div class="qr-scan-line"></div>
+            <div class="qr-placeholder" id="qr-placeholder">Press generate to create<br>a fresh QR code</div>
+          </div>
+          <div class="qr-info">
+            <div class="countdown-ring" id="qr-ring" style="display:none;">
+              <svg width="64" height="64">
+                <circle class="ring-bg" cx="32" cy="32" r="27"></circle>
+                <circle class="ring-fg" id="qr-ring-fg" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="0"></circle>
+              </svg>
+              <div class="countdown-text" id="qr-countdown-text">30</div>
+            </div>
+            <div class="status-line"><span class="status-badge badge-waiting" id="qr-status-badge">Idle</span></div>
+            <p style="margin-top:14px;font-size:13px;color:var(--text-dim);max-width:280px;">Open WhatsApp on your phone, go to Linked Devices, then Link a Device, and scan the code.</p>
+            <button class="btn-primary" style="margin-top:20px;padding:12px 24px;font-size:14px;" onclick="generateQR()" id="qr-generate-btn">Generate QR Code</button>
+          </div>
+        </div>
+        <div id="qr-connected" class="connected-panel" style="display:none;"></div>
+      </div>
+
+      <div class="pair-body" id="tab-code">
+        <div class="code-input-row">
+          <input type="text" class="code-input" id="phone-input" placeholder="Enter phone number with country code, e.g. 94700000000">
+          <button class="btn-primary" onclick="generateCode()" id="code-generate-btn">Generate Pair Code</button>
+        </div>
+        <div id="code-result-area">
+          <p style="font-size:13px;color:var(--text-faint);">Enter your WhatsApp number including country code, no plus sign or spaces. Then open WhatsApp, go to Linked Devices, Link a Device, then Link with phone number instead, and enter the code shown here.</p>
+        </div>
+        <div id="code-connected" class="connected-panel" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Capabilities</div>
+      <h2>Built for speed and stability</h2>
+      <p>Every part of the stack, from the socket layer to the database, is tuned for a bot that stays online and responds instantly.</p>
+    </div>
+    <div class="grid-3">
+      <div class="glass-card feature-card">
+        <div class="feature-icon">&#9889;</div>
+        <h3>Ultra fast messaging</h3>
+        <p>Optimized Baileys socket configuration with caching and minimal overhead for near instant command responses.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <div class="feature-icon">&#128274;</div>
+        <h3>Persistent MongoDB sessions</h3>
+        <p>Auth state, users, settings and logs are all stored in MongoDB, so restarts and redeploys never lose your session.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <div class="feature-icon">&#128260;</div>
+        <h3>Auto reconnect</h3>
+        <p>Automatic reconnection with exponential backoff keeps the bot online through network interruptions.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <div class="feature-icon">&#128737;</div>
+        <h3>Anti crash handling</h3>
+        <p>Global error boundaries catch uncaught exceptions and rejections so one bad command never takes the bot down.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <div class="feature-icon">&#128203;</div>
+        <h3>Group moderation suite</h3>
+        <p>Anti link protection, warnings, welcome and goodbye messages, tagging tools and full admin controls.</p>
+      </div>
+      <div class="glass-card feature-card">
+        <div class="feature-icon">&#128295;</div>
+        <h3>Plugin ready architecture</h3>
+        <p>Drop a new file into the commands folder or register one at runtime. No core code changes required.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="dashboard">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Live Status</div>
+      <h2>System health</h2>
+      <p>A snapshot of the bot's current state, pulled live from the running instance.</p>
+    </div>
+    <div class="dash-grid">
+      <div class="glass-card dash-card">
+        <div class="dash-label">Connection</div>
+        <div class="dash-value" id="d-status">--</div>
+        <div class="dash-sub">Live socket state</div>
+      </div>
+      <div class="glass-card dash-card">
+        <div class="dash-label">Uptime</div>
+        <div class="dash-value" id="d-uptime">--</div>
+        <div class="dash-sub">Since last connect</div>
+      </div>
+      <div class="glass-card dash-card">
+        <div class="dash-label">Users tracked</div>
+        <div class="dash-value" id="d-users">--</div>
+        <div class="dash-sub">Stored in MongoDB</div>
+      </div>
+      <div class="glass-card dash-card">
+        <div class="dash-label">Commands run</div>
+        <div class="dash-value" id="d-commands">--</div>
+        <div class="dash-sub">All time total</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="commands">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Reference</div>
+      <h2>Explore the command list</h2>
+      <p>Over 100 working commands, organized by category. Prefix every command with a dot by default.</p>
+    </div>
+    <input type="text" class="cmd-search" id="cmd-search" placeholder="Search commands, e.g. sticker, ban, weather...">
+    <div class="cmd-categories" id="cmd-categories"></div>
+    <div class="cmd-grid" id="cmd-grid"></div>
+  </div>
+</section>
+
+</main>
+
+<div class="legal-page" id="view-terms">
+  <div class="wrap section">
+    <div class="back-link" onclick="showMain()">&#8592; Back to home</div>
+    <div class="glass-card">
+      <h2>Terms of Service</h2>
+      <div class="updated">Last updated: 2026</div>
+      <p>These terms govern your use of V!PER MD OFC, a WhatsApp multi device bot operated by Sasa Dev. By pairing your WhatsApp account with this service, you agree to the terms below.</p>
+      <h3>Acceptable use</h3>
+      <p>You agree not to use the bot to send spam, harassment, illegal content, or to violate WhatsApp's own terms of service. Accounts found abusing the service may be banned from bot access at the operator's discretion.</p>
+      <h3>Service availability</h3>
+      <p>The bot is provided as is, without guarantee of uninterrupted uptime. Maintenance windows, WhatsApp policy changes, or infrastructure issues may cause temporary downtime.</p>
+      <h3>Account responsibility</h3>
+      <p>You are responsible for maintaining the security of the WhatsApp account you pair. The operator is not liable for actions taken by third parties who gain access to your paired session.</p>
+      <h3>Changes to these terms</h3>
+      <p>These terms may be updated periodically. Continued use of the bot after changes constitutes acceptance of the revised terms.</p>
+    </div>
+  </div>
+</div>
+
+<div class="legal-page" id="view-privacy">
+  <div class="wrap section">
+    <div class="back-link" onclick="showMain()">&#8592; Back to home</div>
+    <div class="glass-card">
+      <h2>Privacy Policy</h2>
+      <div class="updated">Last updated: 2026</div>
+      <p>This policy explains what data V!PER MD OFC collects and how it is used.</p>
+      <h3>Data we store</h3>
+      <ul>
+        <li>WhatsApp session credentials required to keep the bot connected</li>
+        <li>Your WhatsApp ID, display name, and command usage statistics</li>
+        <li>Group settings you configure, such as welcome messages and moderation preferences</li>
+        <li>Basic operational logs used for debugging and reliability</li>
+      </ul>
+      <h3>What we do not do</h3>
+      <p>We do not sell your data to third parties. We do not read your private message content beyond what is required to process the commands you send to the bot.</p>
+      <h3>Data retention</h3>
+      <p>Session and user data is retained until you request deletion or unlink your device. You can request account data removal by contacting the owner through the support channel.</p>
+      <h3>Third party services</h3>
+      <p>Certain commands, such as downloaders or AI features, call third party APIs to fulfill your request. Refer to those providers' own privacy policies for details on their data handling.</p>
+    </div>
+  </div>
+</div>
+
+<div class="legal-page" id="view-faq">
+  <div class="wrap section">
+    <div class="back-link" onclick="showMain()">&#8592; Back to home</div>
+    <div class="glass-card">
+      <h2>Frequently Asked Questions</h2>
+      <div class="updated">Everything you need to know before pairing</div>
+
+      <div class="faq-item">
+        <div class="faq-q">Is pairing safe? <span class="faq-plus">+</span></div>
+        <div class="faq-a">Yes. Pairing uses WhatsApp's own official multi device linking system through Baileys. Your password is never requested at any point.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Why did my QR code or pair code expire? <span class="faq-plus">+</span></div>
+        <div class="faq-a">Codes expire after 30 seconds for security. Simply generate a new one if it expires before you scan or enter it.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I unlink the bot later? <span class="faq-plus">+</span></div>
+        <div class="faq-a">Yes. Open WhatsApp, go to Linked Devices, and remove V!PER MD OFC from the list at any time.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How many commands does the bot have? <span class="faq-plus">+</span></div>
+        <div class="faq-a">Over 100 commands spanning general utilities, group moderation, converters, downloaders, search, AI, fun, and owner tools.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Where can I get help? <span class="faq-plus">+</span></div>
+        <div class="faq-a">Join the official support channel linked at the top and bottom of this page for announcements and help.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <div class="brand" style="margin-bottom:16px;">
+          <img src="https://i.ibb.co/G4z2SQ4M/160640.png" alt="logo">
+          <div class="brand-name">V!PER MD <span>OFC</span></div>
+        </div>
+        <p style="color:var(--text-dim);font-size:14px;max-width:320px;">An ultra fast, modern, production ready WhatsApp multi device bot.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#" onclick="showLegal('terms');return false;">Terms</a>
+        <a href="#" onclick="showLegal('privacy');return false;">Privacy</a>
+        <a href="#" onclick="showLegal('faq');return false;">FAQ</a>
+        <a href="https://whatsapp.com/channel/0029Vb86hKVJUM2SYD2qNw3K" target="_blank">Support Channel</a>
+      </div>
+    </div>
+    <div class="footer-text">
+      (c) POWERD BY SASA DEV<br>
+      CONNECT V!PER MD :- https://vipermd.sasatech.online
+    </div>
+  </div>
+</footer>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
